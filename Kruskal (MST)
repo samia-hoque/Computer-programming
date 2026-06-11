@@ -1,0 +1,72 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+struct Edge {
+    int u, v, w;
+};
+
+vector<int> parent, rnk;
+
+int findPar(int x) {
+    if (parent[x] == x) return x;
+    return parent[x] = findPar(parent[x]);
+}
+
+void unite(int a, int b) {
+    a = findPar(a);
+    b = findPar(b);
+
+    if (a != b) {
+        if (rnk[a] < rnk[b]) swap(a, b);
+        parent[b] = a;
+        if (rnk[a] == rnk[b]) rnk[a]++;
+    }
+}
+
+int kruskals(int g_nodes, vector<int> g_from, vector<int> g_to, vector<int> g_weight) {
+    vector<Edge> edges;
+
+    int m = g_from.size();
+    for (int i = 0; i < m; i++) {
+        edges.push_back({g_from[i], g_to[i], g_weight[i]});
+    }
+
+    sort(edges.begin(), edges.end(), [](Edge a, Edge b) {
+        if (a.w == b.w) return (a.u + a.v) < (b.u + b.v);
+        return a.w < b.w;
+    });
+
+    parent.resize(g_nodes + 1);
+    rnk.assign(g_nodes + 1, 0);
+
+    for (int i = 1; i <= g_nodes; i++) parent[i] = i;
+
+    long long total = 0;
+
+    for (auto &e : edges) {
+        if (findPar(e.u) != findPar(e.v)) {
+            unite(e.u, e.v);
+            total += e.w;
+        }
+    }
+
+    return total;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n, m;
+    cin >> n >> m;
+
+    vector<int> g_from(m), g_to(m), g_weight(m);
+
+    for (int i = 0; i < m; i++) {
+        cin >> g_from[i] >> g_to[i] >> g_weight[i];
+    }
+
+    cout << kruskals(n, g_from, g_to, g_weight) << "\n";
+
+    return 0;
+}
