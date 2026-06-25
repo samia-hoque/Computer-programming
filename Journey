@@ -1,0 +1,50 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+const int N = 100005;
+
+vector<int> adj[N];
+double ans = 0.0;
+
+void dfs(int u, int parent, double prob, int depth) {
+
+    int children = 0;
+
+    for (int v : adj[u]) {
+        if (v != parent)
+            children++;
+    }
+
+    if (children == 0) {
+        ans += prob * depth;
+        return;
+    }
+
+    for (int v : adj[u]) {
+        if (v == parent) continue;
+
+        dfs(v, u, prob / children, depth + 1);
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+
+    for (int i = 0; i < n - 1; i++) {
+        int u, v;
+        cin >> u >> v;
+
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    dfs(1, 0, 1.0, 0);
+
+    cout << fixed << setprecision(15) << ans << '\n';
+
+    return 0;
+}
